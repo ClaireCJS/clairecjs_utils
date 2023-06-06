@@ -12,10 +12,14 @@ DEBUG_RENAME = False
 
 
 def rename(filename, new_filename):
-"""
+    """
     A renamer that will never overwrite an existing file, instead adding "-1", "-2", "-3", etc, to the filename until it is unique
 
-"""
+    Returns the new name as a return value
+
+    filename_we_actually_renamed_it_to = rename(before_rename_filename, intended_after_rename_filename)
+
+    """
     global DEBUG_RENAME
     if DEBUG_RENAME: print(f"* called: rename({filename},{new_filename})")
     if not os.path.exists(filename): raise FileNotFoundError(f"{filename} does not exist")

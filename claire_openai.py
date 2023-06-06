@@ -12,15 +12,15 @@ OPENAI_FAIL_SLEEP_TIME = 21                     #as of 20230428 max requests of 
 
 def ask_GPT(our_prompt, personality="You are a helpful assistant", additionalContext="", randomness=0.5, max_tokens=100,
             debug = False, debugMore = False):
-"""
-    A super-easy way to query OpenAI's ChatGPT/GPT entity, assuming you have an API key in your environment.
+    """
+        A super-easy way to query OpenAI's ChatGPT/GPT entity, assuming you have an API key in your environment.
 
-    Can also set USE_GPT4=1 at the command line, but be careful with those API fees
+        Can also set USE_GPT4=1 at the command line, but be careful with those API fees
 
-    answer = ask_GPT("How much would could a woodchuck chuck?")
+        answer = ask_GPT("How much would could a woodchuck chuck?")
 
-    can also pass additionalContext, randomness(0-2), and max_tokens
-"""
+        can also pass additionalContext, randomness(0-2), and max_tokens
+    """
     global OPENAI_FAIL_SLEEP_TIME, DEFAULTMODEL
 
     if os.environ.get('USE_GPT4') == '1': model = "gpt-4"
