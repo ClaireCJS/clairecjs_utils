@@ -20,6 +20,8 @@ import colorama
 from colorama import init, Fore, Back, Style
 init(autoreset=True)
 
+
+PRODUCTION = True
 DEBUG_CLAIRE_CONSOLE = False
 
 
@@ -76,7 +78,7 @@ clear_screen = cls
 
 
 def set_screen_rgb(r,g,b,code="11",testing=False, mode="something", count=1):
-    sys.stdout.write(f'\x1b]{code};rgb:{r:x}/{g:x}/{b:x}\x1b\\')
+    sys.stdout.write(f'\x1b]{code};rgb_value:{r:x}/{g:x}/{b:x}\x1b\\')
     if testing: sys.stdout.write(   f'\r* New {mode} r: {r:3}/{g:3}/{b:3} count={count}')
     sys.stdout.flush()
 set_rgb = set_screen_rgb
@@ -184,13 +186,16 @@ class ColorControl:
         screen_color_reset()  # Reset the console color
 
     def tock(self):
-        #print("TOCK!")
-        for color_code, rgb_values in enumerate(default_rgb_for_color_code):
-            r, g, b = default_rgb_for_color_code[color_code]
-            #color_code = mapping_console_color_to_ansi_color.get(color_code, color_code)
-            sys.stdout.write(f"\ncolor_code={color_code:>2}, rgb_values={r:2x}{g:2x}{b:2x}    ")
-            sys.stdout.write(f'\\x1b]{color_code}; \trgb:{r:0x}/{g:0x}/{b:0x}\\x1b\\') #rem escaped the 2 escapes and put \t before rgb:
-            sys.stdout.write( f'\x1b]{color_code};rgb:{r:x}/{g:x}/{b:x}\x1b\\')  #normal
+        global PRODUCTION
+        if PRODUCTION == False:
+            print("TOCK!")
+            for color_code, rgb_values in enumerate(default_rgb_for_color_code):
+                r, g, b = default_rgb_for_color_code[color_code]
+                #color_code = mapping_console_color_to_ansi_color.get(color_code, color_code)
+                sys.stdout.write(f"\ncolor_code_tock={color_code:>2}, rgb_values={r:2x}{g:2x}{b:2x}    ")
+                sys.stdout.write(f'\\x1b]{color_code}; \trgb:{r:0x}/{g:0x}/{b:0x}\\x1b\\') #rem escaped the 2 escapes and put \t before rgb:
+                sys.stdout.write( f'\x1b]{color_code};rgb:{r:x}/{g:x}/{b:x}\x1b\\')  #normal
+            print("\n")
 
 
         #ys.stdout.write(f'\x1b]10;rgb:{r:x}/{g:x}/{b:x}\x1b\\')
