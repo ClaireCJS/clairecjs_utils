@@ -198,12 +198,17 @@ class ColorControl:
             print("\n")
 
 
+        #reset the foreground and background to white/black
         #ys.stdout.write(f'\x1b]10;rgb:{r:x}/{g:x}/{b:x}\x1b\\')
         sys.stdout.write(f'\x1b]10;rgb:c0/c0/c0\x1b\\')
         sys.stdout.write(f'\x1b]11;rgb:00/00/00\x1b\\')
 
 
         #screen_color_reset()  # Reset the console color
+
+
+def tick(mode=None, testing=False,test_name="None",sleep=None, j=None):  color_control.tick(mode=mode, testing=testing, test_name=test_name, sleep=sleep, j=j)
+def tock():                                                              color_control.tock()
 
 
 default_rgb_for_color_code = [
@@ -234,8 +239,6 @@ mapping_console_color_to_ansi_color = {
 color_control = ColorControl()
 atexit.register(color_control.tock)     # Register tock() function with atexit so it automatically runs when the program ends
 
-def tick(mode=None, testing=False,test_name="None",sleep=None, j=None):
-    color_control.tick(mode=mode, testing=testing, test_name=test_name, sleep=sleep, j=j)
 
 
 def tick_subtest(mode,num_ticks=7500000):
