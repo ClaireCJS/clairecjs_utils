@@ -1,4 +1,6 @@
+#TO USE: import clairecjs_utils as claire
 import os
+import re
 import shutil
 from colorama import Fore, init
 init()
@@ -43,4 +45,13 @@ def rename(filename, new_filename):
     except FileExistsError: print(f"{Fore.RED}Failed to rename file. Destination file already exists: {new_filename}") ; return ""
     except OSError as e:    print(f"{Fore.RED}Failed to rename file: {e}")                                             ; return ""
     return return_value
+
+
+
+def strip_ansi_from_file(filename):
+    ansi_escape = re.compile(r'\x1B(?:[@-Z\\-_]|\[[0-?]*[ -/]*[@-~])')
+    with open(filename, 'r') as file:
+        log_content          = file.read()
+        log_content_stripped = ansi_escape.sub('', log_content)
+    with open(filename, 'w') as file: file.write(log_content_stripped)
 
