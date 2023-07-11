@@ -1,3 +1,10 @@
+#import clairecjs_utils as claire
+
+
+
+
+
+
 #TODO sed-ansi-test-TODO.bat for proper color reset
 
 #TODO start with whatever precomputed value is closest to our current rgb value of color based on our internal mapping table rather than the start of our computed rgb value matrix
@@ -118,6 +125,9 @@ class ColorControl:
     current_color_code = "???"       # Represents the currently set color code
     last_color_changed_code = None   # Represents the last color code that was changed
 
+
+
+
     def color_cycle(self, mode="fg", count=1000, sleep=None, now=None, prevent_machine_slowdown=True, testing=False, suppress_testing_header=False, test_name='None', j=None):
         if testing and not suppress_testing_header:
             parameters = ", ".join([f"{param}: {value}" for param, value in locals().items() if param != 'self'])
@@ -135,13 +145,20 @@ class ColorControl:
         if self.last_color_changed_code is None or self.last_color_changed_code != code:
                 self.last_color_changed_code = code
 
+        def offset_rgb(r, g, b):
+            r = (r + 128) % 256
+            g = (g + 128) % 256
+            b = (b + 128) % 256
+            return r, g, b
+
         for i in range(count):
             r, g, b = self.rgb_values[self.rgb_index]
-            if code is not "both":
+            if code != "both":
                 sys.stdout.write(f'\x1b]{code};rgb:{r:x}/{g:x}/{b:x}\x1b\\')
             else:
-                sys.stdout.write(f'\x1b]10;rgb:{r:x}/{g:x}/{b:x}\x1b\\')
-                sys.stdout.write(f'\x1b]11;rgb:{r:x}/{g:x}/{b:x}\x1b\\')
+                r2, g2, b2 = offset_rgb(r, g, b)
+                sys.stdout.write(f'\x1b]10;rgb:{r :x}/{g :x}/{b :x}\x1b\\')
+                sys.stdout.write(f'\x1b]11;rgb:{r2:x}/{g2:x}/{b2:x}\x1b\\')
             #ys.stdout.write( f'\n ]{code};rgb:{r:x}/{g:x}/{b:x}\t\t')
             if testing: sys.stdout.write(f'\r*\t New {mode} r: {r:3}/{g:3}/{b:3} count={count} i={i} \t testname={self.test_name} \t j={j}')
             sys.stdout.flush()
@@ -207,7 +224,8 @@ class ColorControl:
         #screen_color_reset()  # Reset the console color
 
 
-def tick(mode=None, testing=False,test_name="None",sleep=None, j=None):  color_control.tick(mode=mode, testing=testing, test_name=test_name, sleep=sleep, j=j)
+#              vvv---- this is the default mode if we lazily call claire.tick() from somewhere external
+def tick(mode="fg", testing=False,test_name="None",sleep=None, j=None):  color_control.tick(mode=mode, testing=testing, test_name=test_name, sleep=sleep, j=j)
 def tock():                                                              color_control.tock()
 
 
