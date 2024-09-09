@@ -123,7 +123,6 @@ class ColorControl:
     min_cycle_delta =  0.1                                                                                            # minimum time interval between color changes
     current_color_code = "???"       # Represents the currently set color code
     last_color_changed_code = None   # Represents the last color code that was changed
-
     def color_cycle(self, mode="fg", count=1000, sleep=None, now=None, prevent_machine_slowdown=True, testing=False, suppress_testing_header=False, test_name='None', j=None):
         if testing and not suppress_testing_header:
             parameters = ", ".join([f"{param}: {value}" for param, value in locals().items() if param != 'self'])
@@ -147,11 +146,17 @@ class ColorControl:
             b = (b + 128) % 256
             return r, g, b
 
+        def convert_rgb_tuple_to_hex_string_with_hash(r, g, b):
+            return "#{:02X}{:02X}{:02X}".format(r, g, b)
+
+        r2, g2, b2, rgb_hex2 = None, None, None, None
         for i in range(count):
             r1, g1, b1 = self.rgb_values[self.rgb_index]
+            rgb_hex1 = convert_rgb_tuple_to_hex_string_with_hash(r1,g1,b1)
             if code != "both":
                 #sys.stdout.write(f'\n [{code};rgb:{r1:x}/{g1:x}/{b1:x}]')
                 sys .stdout.write(f'\x1b]{code};rgb:{r1:x}/{g1:x}/{b1:x}\x1b\\')
+                sys .stdout.write(f'\x1b[ q\x1b]12;{rgb_hex1}\x07')
                 #sys.stdout.write( f'\x1b]1;rgb:{r1:x}/{g1:x}/{b1:x}\x07\x1b\\')
                 #sys.stdout.write( f'\x1b]2;rgb:{r1:x}/{g1:x}/{b1:x}\x07\x1b\\')
                 #sys.stdout.write( f'\x1b]3;rgb:{r1:x}/{g1:x}/{b1:x}\x07\x1b\\')
@@ -168,6 +173,7 @@ class ColorControl:
                 #sys.stdout.write(f'\x1b]16;rgb:{r1:x}/{g1:x}/{b1:x}\x07\x1b\\')
             else:
                 r2, g2, b2 = offset_rgb(r1, g1, b1)
+                rgb_hex2 = convert_rgb_tuple_to_hex_string_with_hash(r2,g2,b2)
                 sys.stdout.write(f'\x1b]10;rgb:{r1:x}/{g1:x}/{b1:x}\x1b\\')
                 sys.stdout.write(f'\x1b]11;rgb:{r2:x}/{g2:x}/{b2:x}\x1b\\')
             #ys.stdout.write( f'\n ]{code};rgb:{r:x}/{g:x}/{b:x}\t\t')
@@ -178,6 +184,8 @@ class ColorControl:
                 if now: self.last_time = now                              # Update 'last_time' after changing color and optional sleeping
                 else:   self.last_time = time.time()
             self.rgb_index = (self.rgb_index + 1) % len(self.rgb_values)  # Update index, roll over to 0 when reaching the end of rgb_values
+        return r1, g1, b1, rgb_hex1, r2, g2, b2, rgb_hex2
+
 
     def tock_old(self):
         #r, g, b = self.rgb_values[self.rgb_index]
@@ -204,6 +212,7 @@ class ColorControl:
             self.color_cycle(mode=mode, count=1, testing=testing, suppress_testing_header=True, sleep=sleep, now=now, j=j)
             #self.color_cycle(mode=3, count=1, testing=testing, suppress_testing_header=True, sleep=sleep, now=now, j=j)
             self.last_cycle_time = now
+        #return r, g, b 🐐
 
     def tock_closer(self):
         for color_code, rgb_values in enumerate(default_rgb_for_color_code):
@@ -286,7 +295,6 @@ def tick_subtest(mode,num_ticks=7500000):
         tick(mode=mode,testing=True,sleep=0,j=j)
         #print(f"\tj={j}",end="")
     print("\n...Tick test complete.\n")
-
 
 def tick_test():
     num_ticks = 7500000
