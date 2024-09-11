@@ -53,8 +53,8 @@ import logging as logging
 for    handler in logging.root.handlers[:]: logging.root.removeHandler(handler)
 logging.basicConfig(level=logging.DEBUG,format='\t\t[%(levelname)s] %(message)s')
 logger                  = logging.getLogger(__name__)
-logger.setLevel          (logging.DEBUG)
-logger.debug            ("dashboard logger started")
+logger.setLevel          (logging.WARNING)
+logger.debug             ("dashboard logger started")
 ############################################## LOGGING ###############################################
 
 import tempfile
