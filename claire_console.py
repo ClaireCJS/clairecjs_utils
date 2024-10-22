@@ -118,12 +118,15 @@ def get_rgb_values(color_code):
 class ColorControl:
     rgb_values      = [tuple(round(j * 255) for j in colorsys.hsv_to_rgb(i / 256.0, 1.0, 1.0)) for i in range(2560)]  # Precompute RGB values
     rgb_index       = 0                                                                                               # Initialize index
+
     test_name       = "None"
     last_cycle_time =  None
     min_cycle_delta =  0.1                                                                                            # minimum time interval between color changes
+
     current_color_code = "???"       # Represents the currently set color code
     last_color_changed_code = None   # Represents the last color code that was changed
-    def color_cycle(self, mode="fg", count=1000, sleep=None, now=None, prevent_machine_slowdown=True, testing=False, suppress_testing_header=False, test_name='None', j=None):
+
+    def color_cycle(self, mode="fg", count=1000, sleep=None, now=None, prevent_machine_slowdown=True, testing=False, suppress_testing_header=False, test_name='None', j=None, color_step=1):
         if testing and not suppress_testing_header:
             parameters = ", ".join([f"{param}: {value}" for param, value in locals().items() if param != 'self'])
             print(f"\n\n* Color Cycle Test:\n\t{parameters}")
@@ -144,6 +147,7 @@ class ColorControl:
             r = (r + 128) % 256
             g = (g + 128) % 256
             b = (b + 128) % 256
+            #todo something to make the blinkyness go away
             return r, g, b
 
         def convert_rgb_tuple_to_hex_string_with_hash(r, g, b):
@@ -183,7 +187,7 @@ class ColorControl:
             if prevent_machine_slowdown:
                 if now: self.last_time = now                              # Update 'last_time' after changing color and optional sleeping
                 else:   self.last_time = time.time()
-            self.rgb_index = (self.rgb_index + 1) % len(self.rgb_values)  # Update index, roll over to 0 when reaching the end of rgb_values
+            self.rgb_index = (self.rgb_index + color_step) % len(self.rgb_values)  # Update index, roll over to 0 when reaching the end of rgb_values
         return r1, g1, b1, rgb_hex1, r2, g2, b2, rgb_hex2
 
 
@@ -205,12 +209,12 @@ class ColorControl:
         sys.stdout.write(f'\x1b]{self.current_color_code};rgb:{r:x}/{g:x}/{b:x}\x1b\\')
         screen_color_reset()                                                        # generic console reset function to start with
 
-    def tick(self, sleep=None, mode=None, testing=False, test_name="None", j=None):
+    def tick(self, sleep=None, mode=None, testing=False, test_name="None", j=None, count=1, color_step=1):
         now = time.time()
         self.test_name = test_name
         if self.last_cycle_time is None or now - self.last_cycle_time >= self.min_cycle_delta:
-            self.color_cycle(mode=mode, count=1, testing=testing, suppress_testing_header=True, sleep=sleep, now=now, j=j)
-            #self.color_cycle(mode=3, count=1, testing=testing, suppress_testing_header=True, sleep=sleep, now=now, j=j)
+            #elf.color_cycle(mode= 3  , count=  1  , testing=testing, suppress_testing_header=True, sleep=sleep, now=now, j=j)
+            self.color_cycle(mode=mode, count=count, testing=testing, suppress_testing_header=True, sleep=sleep, now=now, j=j, color_step=color_step)
             self.last_cycle_time = now
         #return r, g, b 🐐
 
@@ -252,8 +256,8 @@ class ColorControl:
 
 
 #              vvv---- this is the default mode if we lazily call claire.tick() from somewhere external
-def tick(mode="fg", testing=False,test_name="None",sleep=None, j=None):  color_control.tick(mode=mode, testing=testing, test_name=test_name, sleep=sleep, j=j)
-def tock():                                                              color_control.tock()
+def tick(mode="fg", testing=False,test_name="None",sleep=None, j=None, count=1, color_step=1):  color_control.tick(mode=mode, testing=testing, test_name=test_name, sleep=sleep, j=j, count=count, color_step=color_step)
+def tock():                                                                                     color_control.tock()
 
 
 default_rgb_for_color_code = [
